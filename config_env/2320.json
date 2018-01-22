@@ -1,0 +1,11 @@
+{
+    "id": "232",
+    "name": "Voova group",
+    "website": "http://journey.local.ppcnseo.com/",
+    "code": "2320",
+    "share_server": "ecm",
+    "db_user": "localdev",
+    "db_pass": "localdev",
+    "db_host": "52.77.47.28",
+    "db_name": "ecm_journey"
+}

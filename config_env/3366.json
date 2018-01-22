@@ -1,0 +1,11 @@
+{
+  "id": "205",
+  "name": "Demo Company",
+  "website": "http://demo.ecoachmanager.com/",
+  "code": "3366",
+  "share_server": "ecm",
+  "db_user": "9KL97WWBJ9MVTZyV",
+  "db_pass": "s5v7rGAtZpawNGsj",
+  "db_host": "voovamariadblive.c2twiultssq7.eu-west-1.rds.amazonaws.com",
+  "db_name": "demo"
+}

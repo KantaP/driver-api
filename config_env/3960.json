@@ -1,0 +1,11 @@
+{
+  "id": "396",
+  "name": "dev test",
+  "website": "http://dev.uk.ecoachmanager.com/",
+  "code": "3960",
+  "share_server": "ecm",
+  "db_user": "dev_testWjLu6h",
+  "db_pass": "puShcXCqmjGPu7J8",
+  "db_host": "voovamariadblive.c2twiultssq7.eu-west-1.rds.amazonaws.com",
+  "db_name": "dev_test"
+}
