@@ -27,7 +27,7 @@ module.exports = {
             "sms_pass": 'demo01'
         }
     },
-    "pheonix":{
+    "pheonix": {
         "secret": "ecm",
         "pheonixKey": "PheonixDareDevil",
         "secretKey": "Civilwar",
@@ -54,22 +54,22 @@ module.exports = {
         "sms_api": '3266470',
         "sms_user": 'ecmauuk',
         "sms_pass": 'demo01',
-        "google_api_key":{
-            "fcm_key":"key=AAAAXrQxyXU:APA91bGt2jgdHo9pKwbhVBKA_-gIawP_2FTohcR-kdyRpQvJf0OPHb2agOGL3KUfVIL0-dpz15Wdl5eZNrgHxp8qCERErnR4uETWn0NCyhdJonlPzwfWRv9xITubvtoliTuzP8EneFaOSllw1ToNFJnQe72RMpXhHQ"
+        "google_api_key": {
+            "fcm_key": "key=AAAAXrQxyXU:APA91bGt2jgdHo9pKwbhVBKA_-gIawP_2FTohcR-kdyRpQvJf0OPHb2agOGL3KUfVIL0-dpz15Wdl5eZNrgHxp8qCERErnR4uETWn0NCyhdJonlPzwfWRv9xITubvtoliTuzP8EneFaOSllw1ToNFJnQe72RMpXhHQ"
         },
-        "system_prefix":""
+        "system_prefix": ""
     },
-    "globaldriver":{
+    "globaldriver": {
         "secret": "ecm",
         "globalKey": "TheManWhoSoldTheWorld",
         "secretKey": "ZebraWannaDriveAJEEP"
     },
-    "ecmdriver":{
+    "ecmdriver": {
         "secret": "ecm",
         "ecmKey": "1amZ00K33p3r",
-        "secretKey": "Th3L10nK155aD33R"
+        "secretKey": "ZebraWannaDriveAJEEP"
     },
-    "programmer":{
+    "programmer": {
         "user": 'programmer',
         "password": 'Pa$$wordIT01',
         "database": 'ecm_share',

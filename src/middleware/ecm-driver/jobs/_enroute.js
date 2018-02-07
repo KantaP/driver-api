@@ -39,12 +39,15 @@ export const endRoute = (movement_id, quote_id, datetime, pool) => {
         var failedPassengers = await alreadyFailed(quote_id, pool)
         var sql = `
             UPDATE tb_job_passengers SET status = '1'  , force_login = 1 , date_time_scan = ?
-            WHERE quote_id = ? AND status = 0 AND pickup = 0 AND passenger_id NOT IN (?)
+            WHERE quote_id = ? AND status = 0 AND pickup = 0
         `
+        if (failedPassengers.length > 0) {
+            sql += `AND passenger_id NOT IN (${failedPassengers.map((item) => item.passenger_id).join(',')})`
+        }
         console.log('alreadyFailed', failedPassengers, failedPassengers.map((item) => item.passenger_id).join(','))
         pool.getConnection((err, conn) => {
             if (err) reject(err)
-            conn.query(sql, [datetime, quote_id, failedPassengers.map((item) => item.passenger_id).join(',')], (err, rows) => {
+            conn.query(sql, [datetime, quote_id], (err, rows) => {
                 conn.destroy()
                 if (err) reject(err)
                 console.log('endRoute Error:', err)

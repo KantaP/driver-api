@@ -12,6 +12,7 @@ import * as driver_accept from './_driver_accept'
 import * as enroute_action from './_enroute'
 import _ from 'lodash'
 import { enroute } from './_enroute';
+import * as mobileAction from '../mobileSettings/action'
 
 const tokenKey = (req, res, next) => {
     let key = req.headers['x-access-token']
@@ -82,7 +83,7 @@ jobs.get('/all', async(req, res) => {
                 max_passenger: movementDetail[j].default_num_id,
                 pay_ok: movementDetail[j].pay_ok,
                 destination: movementDetail[j].destination_address,
-                passengers_num: movementDetail[j].passenger_number,
+                passenger_num: movementDetail[j].passenger_num,
                 passenger_name: movementDetail[j].passenger_name,
                 driver_confirm: (movementDetail[j].driver_confirm == null ? "0000-00-00 00:00:00" : movementDetail[j].driver_confirm),
                 driver_accept: isJobAccept,
@@ -92,7 +93,8 @@ jobs.get('/all', async(req, res) => {
                 date_departure: moment(movementDetail[j].date_departure).format('Do MMM YYYY'),
                 time_departure: moment(movementDetail[j].date_departure).format('hh:mm'),
                 date_end: moment(movementDetail[j].date_end).format('Do MMM YYYY hh:mm'),
-                onsite_before: moment(movementDetail[j].datetime_start).format('hh:mm')
+                onsite_before: moment(movementDetail[j].datetime_start).format('hh:mm'),
+                driver_notes: movementDetail[j].driver_notes
             }
             resp.push(data)
         }
@@ -420,13 +422,23 @@ jobs.post('/endJourney', async(req, res) => {
 
 jobs.post('/enroute', async(req, res) => {
     try {
-        var movement_order = req.body.movement_order
-        var movement_id = req.body.movement_id
-        var quote_id = req.body.quote_id
+        var { movement_order, movement_id, quote_id, lat, lng, date_time } = req.body
         var company_code = req.decoded.company_code
+        var id = req.decoded.id
         var pool = await Util.initConnection(company_code)
         var isMovementUpdated = await update_action.updateProgressMovement(movement_order, 8, quote_id, pool)
-        var isPrevMovementUpdated = await update_action.updateProgressMovement((movement_order - 1), 10, quote_id, pool)
+        if ((movement_order - 1) > 0) {
+            var isPrevMovementUpdated = await update_action.updateProgressMovement((movement_order - 1), 10, quote_id, pool)
+            var saveDriverLog = await mobileAction.saveDriverActionByMovementOrder({
+                quote_id,
+                movement_order: (movement_order - 1),
+                action: 10,
+                date_time,
+                lat,
+                lng,
+                type: 'A'
+            }, id, pool)
+        }
         var progressUpdateAt = await update_action.progressUpdateAt(movement_order, quote_id, pool)
         var failedBoardPassengerCount = await enroute_action.enroute(movement_id, pool)
         var failedBoardPassenger = []

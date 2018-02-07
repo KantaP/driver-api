@@ -111,40 +111,44 @@ notification.post('/sendToDriverFromAdmin', async(req, res) => {
             try {
                 var driverToken = await findDriverToken(driver_id, pool)
                 console.log(driverToken)
+                var promiseSend = []
                 for (let i = 0; i < data.movements.length; i++) {
                     var m_detail = await findMovementDetail(data.quote_id, data.movements[i], pool)
-                    var payload = {
-                        data: {
-                            quote_id: data.quote_id,
-                            pickupDate: moment(m_detail[0].date_start).format('DD-MM-YYYY'),
-                            pickupTime: m_detail[0].time_start.toString(),
-                            pickup: m_detail[0].collection_address,
-                            pax: m_detail[0].num_id.toString()
+                    if (typeof m_detail != 'undefined') {
+                        var payload = {
+                            data: {
+                                quote_id: data.quote_id,
+                                pickupDate: moment(m_detail[0].date_start).format('DD-MM-YYYY'),
+                                pickupTime: m_detail[0].time_start.toString(),
+                                pickup: m_detail[0].collection_address,
+                                pax: m_detail[0].num_id.toString()
+                            }
+                        }
+                        if (driverToken.length > 0) {
+                            req.firebase.messaging().sendToDevice(
+                                    driverToken.map((item) => item.token),
+                                    payload, {
+                                        contentAvailable: true,
+                                        priority: "normal",
+                                    })
+                                .then(function(response) {
+                                    // See the MessagingDevicesResponse reference documentation for
+                                    // the contents of response.
+                                    console.log("Successfully sent message:", response);
+                                    res.send(response)
+                                })
+                                .catch(function(error) {
+                                    console.log("Error sending message:", error);
+                                    res.send(error)
+                                });
+                        } else {
+                            res.send({
+                                status: false,
+                                msg: 'Not found token for this driver'
+                            })
                         }
                     }
-                    if (driverToken.length > 0) {
-                        req.firebase.messaging().sendToDevice(
-                                driverToken.map((item) => item.token),
-                                payload, {
-                                    contentAvailable: true,
-                                    priority: "normal",
-                                })
-                            .then(function(response) {
-                                // See the MessagingDevicesResponse reference documentation for
-                                // the contents of response.
-                                console.log("Successfully sent message:", response);
-                                res.send(response)
-                            })
-                            .catch(function(error) {
-                                console.log("Error sending message:", error);
-                                res.send(error)
-                            });
-                    } else {
-                        res.send({
-                            status: false,
-                            msg: 'Not found token for this driver'
-                        })
-                    }
+
                 }
 
             } catch (err) {

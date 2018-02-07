@@ -1,6 +1,22 @@
 export const getMobileSettings = (pool) => {
     return new Promise((resolve, reject) => {
-        var sql = "SELECT * FROM `tb_config_int` WHERE `key` LIKE '%app_setting_show_only_allocated%' OR `key` LIKE '%app_setting_download_vehicle_history%'"
+        var sql = "SELECT * FROM `tb_config_int` WHERE `key` LIKE '%app_setting_show_only_allocated%' OR `key` LIKE '%app_setting_download_vehicle_history%' OR `key` LIKE '%enable_broadcast%'"
+        pool.getConnection((err, conn) => {
+            if (err) reject(err)
+            conn.query(sql, (err, rows) => {
+                conn.destroy()
+                if (err) reject(err)
+                resolve(rows)
+            })
+        })
+    })
+}
+
+
+
+export const getMobileSettingsStr = (pool) => {
+    return new Promise((resolve, reject) => {
+        var sql = "SELECT * FROM `tb_config_str` WHERE `key` = 'broadcast_audio' OR `key` = 'voice_url'"
         pool.getConnection((err, conn) => {
             if (err) reject(err)
             conn.query(sql, (err, rows) => {
@@ -85,6 +101,95 @@ export const getWordByLang = (lang, pool) => {
         pool.getConnection((err, conn) => {
             if (err) reject(err)
             conn.query(sql, [lang], (err, rows) => {
+                conn.destroy()
+                if (err) reject(err)
+                resolve(rows)
+            })
+        })
+    })
+}
+
+export const getWalkieTalkieSetting = (pool) => {
+    return new Promise((resolve, reject) => {
+        var sql = "SELECT * FROM tb_config_int WHERE key LIKE ?";
+        pool.getConnection((err, conn) => {
+            if (err) reject(err)
+            conn.query(sql, ['%enable_broadcast%'], (err, rows) => {
+                conn.destroy()
+                if (err) reject(err)
+                resolve(rows)
+            })
+        })
+    })
+}
+
+export const saveDriverAction = ({ movement_id, action, date_time, lat, lng, type, quote_id }, driver_id, pool) => {
+    return new Promise((resolve, reject) => {
+        var sql = `INSERT INTO tb_driver_action 
+                    SET
+                    movement_id = ?,
+                    progress_id = ? ,
+                    date_time = ? ,
+                    lat = ? ,
+                    lng = ?,
+                    type = ? ,
+                    driver_id = ? ,
+                    quote_id = ?
+               `
+        pool.getConnection((err, conn) => {
+            if (err) reject(err)
+            conn.query(sql, [movement_id, action, date_time, lat, lng, type, driver_id, quote_id], (err, rows) => {
+                conn.destroy()
+                if (err) reject(err)
+                resolve(rows)
+            })
+        })
+    })
+}
+
+export const saveDriverActionByMovementOrder = ({ quote_id, movement_order, action, date_time, lat, lng, type }, driver_id, pool) => {
+    return new Promise((resolve, reject) => {
+        var sql = `INSERT INTO tb_driver_action 
+                    SET
+                    movement_id = (SELECT movement_id FROM tb_quote_movement WHERE quote_id = ? AND movement_order = ?),
+                    progress_id = ? ,
+                    date_time = ? ,
+                    lat = ? ,
+                    lng = ?,
+                    type = ? ,
+                    driver_id = ? ,
+                    quote_id = ?
+               `
+        pool.getConnection((err, conn) => {
+            if (err) reject(err)
+            conn.query(sql, [quote_id, movement_order, action, date_time, lat, lng, type, driver_id, quote_id], (err, rows) => {
+                conn.destroy()
+                if (err) reject(err)
+                resolve(rows)
+            })
+        })
+    })
+}
+
+export const saveDriverActionWhole = ({ quote_id, action, date_time, lat, lng, type }, driver_id, pool) => {
+    return new Promise(async(resolve, reject) => {
+        var movementIds = await getMovementIDs(quote_id, pool)
+        var results = []
+        for (let item of movementIds) {
+            var params = { movement_id: item.movement_id, action, date_time, lat, lng, type, quote_id }
+            var result = await saveDriverAction(params, driver_id, pool)
+            results.push(result)
+        }
+        resolve(results.length)
+    })
+}
+
+const getMovementIDs = (quote_id, pool) => {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT movement_id FROM tb_quote_movement WHERE quote_id = ?`
+        pool.getConnection((err, conn) => {
+            if (err) reject(err)
+            conn.query(sql, [quote_id], (err, rows) => {
                 conn.destroy()
                 if (err) reject(err)
                 resolve(rows)

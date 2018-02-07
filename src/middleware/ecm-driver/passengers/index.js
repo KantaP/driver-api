@@ -136,12 +136,12 @@ passengers.get('/searchPassenger/:quote_id/:query', async(req, res) => {
 })
 
 passengers.post('/passengerUpdateStatus', async(req, res) => {
-    var { passenger_id, status_new, force_login, pickup, action_point_id, timescan } = req.body
+    var { passenger_id, status_new, force_login, pickup, action_point_id, timescan, quote_id } = req.body
     var company_code = req.decoded.company_code
     var pool = await Util.initConnection(company_code)
     try {
-        var updateResult = await action.updatePassengerStatus(passenger_id, status_new, force_login, pickup, action_point_id, timescan, pool)
-        var cloneResult = await action.cloneToHistory(passenger_id, pickup, pool)
+        var updateResult = await action.updatePassengerStatus(passenger_id, status_new, force_login, pickup, action_point_id, timescan, quote_id, pool)
+        var cloneResult = await action.cloneToHistory(passenger_id, pickup, quote_id, pool)
         res.send({
             status: updateResult
         })

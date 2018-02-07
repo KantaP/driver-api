@@ -20,8 +20,37 @@ authen
         console.log(pathFile)
         var isFileExits = await Util.isFileExits(pathFile)
         if (!isFileExits) {
-            res.status(200).send({ code: 0, text: 'Please verify your company code.', result: [] })
-            return
+            // res.status(200).send({ code: 0, text: 'Please verify your company code.', result: [] })
+            // return
+            var companyData = await Util.getCompanyData(comp_code)
+            console.log(companyData)
+            if (typeof companyData != 'undefined') {
+                var accessKey = crypto.createHash('md5').update(Config.ecmdriver.secretKey).digest("hex")
+
+                var configData = await Util.getConfigEnv(companyData.website, accessKey)
+
+                var combine = {
+                    id: companyData.id,
+                    name: companyData.name,
+                    website: companyData.website,
+                    code: companyData.company_code,
+                    share_server: companyData.share_server,
+                    db_user: configData.db_user,
+                    db_pass: configData.db_pass,
+                    db_host: configData.db_host,
+                    db_name: configData.db_name,
+                    ecm_region: companyData.ecm_region
+                }
+
+                console.log(pathFile, combine)
+                console.log('---- create env file ----')
+                    /* CREATE CONFIG ENV FILE */
+                await Util.createFile(pathFile, combine)
+            } else {
+                res.status(200).send({ code: 0, text: 'Not found your company data', result: [] })
+                return
+            }
+
         }
 
         var pool = await Util.initConnection(comp_code)
@@ -54,7 +83,7 @@ authen
         } else if (compData.share_server == "myau") {
             site = "svau.ecoachmanager.com"
         }
-
+        console.log(compData)
         res.status(200).send({
             code: 2,
             text: 'Success',
@@ -63,7 +92,9 @@ authen
             apisite: site,
             website: compData.website,
             port: process.env.PORT,
-            company_logo: compData.website + 'images/invoice_logo.png?notTemp=1058552774'
+            site_id: compData.id,
+            region: compData.ecm_region,
+            company_logo: compData.website + 'images/invoice_logo.png'
         })
     })
 

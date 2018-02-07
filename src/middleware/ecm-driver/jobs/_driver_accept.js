@@ -7,12 +7,14 @@ export const driveAccept = (driver_id, quote_id, pool) => {
         if (!checkBooking) {
             reject(new Error('THIS IS NOT A BOOKING - DRIVER NOT ACCEPT!'))
         }
-        var movements = await getMovements(quote_id, driver_id, pool)
-        var acceptPromises = movements.map((item) => updateDriverAccept(driver_id, item.movement_id, pool))
-        var results = await Promise.all(acceptPromises)
+        // var movements = await getMovements(quote_id, driver_id, pool)
+        // var acceptPromises = movements.map((item) => updateDriverAccept(driver_id, item.movement_id, pool))
+        var results = await updateDriverAccept(driver_id, quote_id, pool)
+            // var results = await Promise.all(acceptPromises)
         var quoteProgress = await update_action.updateProgressQuote(quote_id, 6, pool)
-        var movementProgressPromises = movements.map((item) => update_action.updateProgressMovement(item.movement_order, 6, quote_id, pool))
-        var results2 = await Promise.all(movementProgressPromises)
+            // var movementProgressPromises = movements.map((item) => update_action.updateProgressMovement(item.movement_order, 6, quote_id, pool))
+        var results2 = await update_action.updateProgressMovementsInJob(quote_id, 6, pool)
+            // var results2 = await Promise.all(movementProgressPromises)
         resolve({ acceptJob: results, updateProgress: results2 })
     })
 }
@@ -46,16 +48,16 @@ const updateDriverReject = (driver_id, quote_id, pool) => {
     })
 }
 
-const updateDriverAccept = (driver_id, movement_id, pool) => {
+const updateDriverAccept = (driver_id, quote_id, pool) => {
     return new Promise((resolve, reject) => {
-        var sql = "UPDATE tb_assigned_drivers SET driver_confirm = ? WHERE driver_id = ? AND movement_id = ? AND affiliateDriver = 0"
-        console.log(sql.replace(['?', '?', '?'], [moment().format('YYYY-MM-DD HH:mm:ss'), driver_id, movement_id]))
+        var sql = "UPDATE tb_assigned_drivers SET driver_confirm = ? WHERE driver_id = ? AND quote_id = ? AND affiliateDriver = 0"
+        console.log(sql.replace(['?', '?', '?'], [moment().format('YYYY-MM-DD HH:mm:ss'), driver_id, quote_id]))
         pool.getConnection((err, conn) => {
             if (err) reject(err)
-            conn.query(sql, [moment().utc().format('YYYY-MM-DD HH:mm:ss'), driver_id, movement_id], (err, rows, fields) => {
+            conn.query(sql, [moment().utc().format('YYYY-MM-DD HH:mm:ss'), driver_id, quote_id], (err, rows, fields) => {
                 conn.destroy()
                 if (err) reject(err)
-                if (rows.changedRows > 0) {
+                if (rows['changedRows'] > 0) {
                     resolve(true)
                 } else {
                     resolve(false)

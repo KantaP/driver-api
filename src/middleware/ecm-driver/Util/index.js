@@ -67,6 +67,7 @@ export const getCompanyData = (app_code) => {
 
 export const getConfigEnv = (siteName, key) => {
     return new Promise((resolve, reject) => {
+        console.log(key)
         request.post({
             url: siteName + "lib/api/?env=1",
             headers: {

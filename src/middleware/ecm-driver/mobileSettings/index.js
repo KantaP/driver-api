@@ -29,6 +29,8 @@ mobileSetting.route('/')
         var company_code = req.decoded.company_code
         var pool = await Util.initConnection(company_code)
         var result = await action.getMobileSettings(pool)
+        var resultStr = await action.getMobileSettingsStr(pool)
+        result = result.concat(resultStr)
         res.send({ result: result })
 
     })
@@ -84,5 +86,32 @@ mobileSetting.get('/lang/:lang', async(req, res) => {
         res.send({ status: false, msg: err.message, results: [] })
     }
 })
+
+mobileSetting.post('/driveraction', async(req, res) => {
+    var company_code = req.decoded.company_code
+    var driver_id = req.decoded.id
+    var pool = await Util.initConnection(company_code)
+    try {
+        var results = await action.saveDriverAction(req.body, driver_id, pool)
+        res.send({ status: true, msg: '', results: results.insertId })
+    } catch (err) {
+        res.send({ status: false, msg: err.message, results: null })
+    }
+})
+
+mobileSetting.post('/driveractionwhole', async(req, res) => {
+    var company_code = req.decoded.company_code
+    var driver_id = req.decoded.id
+    var pool = await Util.initConnection(company_code)
+    try {
+        var results = await action.saveDriverActionWhole(req.body, driver_id, pool)
+        res.send({ status: true, msg: '', results: results })
+    } catch (err) {
+        res.send({ status: false, msg: err.message, results: null })
+    }
+})
+
+
+
 
 module.exports = mobileSetting

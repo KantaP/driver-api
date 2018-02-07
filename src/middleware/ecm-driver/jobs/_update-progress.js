@@ -26,6 +26,30 @@ export const updateProgressMovement = (movement_order, progress_status, quote_id
     })
 }
 
+export const updateProgressMovementsInJob = (quote_id, progress_status, pool) => {
+    return new Promise((resolve, reject) => {
+        let sql = `UPDATE tb_quote_movement 
+                    SET 
+                        progress = ? 
+                    WHERE 
+                        quote_id= ?`
+        pool.getConnection((err, conn) => {
+            console.log("pool updateProgressMovementsInJob connection error:", err)
+            conn.query(sql, [progress_status, quote_id], (err, rows, fields) => {
+                conn.destroy()
+                if (err) reject(err)
+                console.log("updateProgressMovementsInJob", rows)
+                if (rows.affectedRows > 0) {
+                    resolve(true)
+                } else {
+                    resolve(false)
+                }
+
+            })
+        })
+    })
+}
+
 export const updateProgressQuote = (quote_id, progress_status, pool) => {
     return new Promise((resolve, reject) => {
         let sql = `UPDATE tb_quote 

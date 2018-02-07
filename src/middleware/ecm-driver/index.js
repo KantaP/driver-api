@@ -13,6 +13,7 @@ import message from './message'
 import passengers from './passengers'
 import mobileSettings from './mobileSettings'
 import notification from './notification'
+// import log from './log'
 
 const ecmDriver = Router()
 const admin = require("firebase-admin");
@@ -51,6 +52,6 @@ ecmDriver.use('/vehicle', vehicle)
 ecmDriver.use('/passengers', passengers)
 ecmDriver.use('/mobileSettings', mobileSettings)
 ecmDriver.use('/notification', notification)
-
+    // ecmDriver.use('/log', log)
 
 module.exports = ecmDriver

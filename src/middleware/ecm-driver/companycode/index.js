@@ -35,7 +35,8 @@ companyCode
                     db_user: configData.db_user,
                     db_pass: configData.db_pass,
                     db_host: configData.db_host,
-                    db_name: configData.db_name
+                    db_name: configData.db_name,
+                    ecm_region: companyData.ecm_region
                 }
 
                 console.log(pathFile, combine)

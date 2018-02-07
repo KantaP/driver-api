@@ -124,13 +124,13 @@ const checkBeforeAligned = (passenger_id, quote_id, j_id, pool) => {
     })
 }
 
-export const cloneToHistory = (passenger_id, pickup, pool) => {
+export const cloneToHistory = (passenger_id, pickup, quote_id, pool) => {
     return new Promise((resolve, reject) => {
-        var sql = 'INSERT INTO tb_job_passengers_history (job_passengers_id, quote_id, passenger_id, point_id, pickup, side, status, date_time_scan, `return`, force_login, log_id, j_id, movement_order, action_point_id) SELECT * FROM tb_job_passengers WHERE passenger_id = ? AND pickup = ? LIMIT 1'
+        var sql = 'INSERT INTO tb_job_passengers_history (job_passengers_id, quote_id, passenger_id, point_id, pickup, side, status, date_time_scan, `return`, force_login, log_id, j_id, movement_order, action_point_id , note) SELECT * FROM tb_job_passengers WHERE passenger_id = ? AND pickup = ? AND quote_id = ? LIMIT 1'
         pool.getConnection((err, conn) => {
             if (err) reject(err)
             console.log("pool cloneToHistory connection error:", err)
-            conn.query(sql, [passenger_id, pickup], (err, rows, fields) => {
+            conn.query(sql, [passenger_id, pickup, quote_id], (err, rows, fields) => {
                 conn.destroy()
                 if (err) throw err
                 resolve(rows.insertId)
@@ -139,15 +139,15 @@ export const cloneToHistory = (passenger_id, pickup, pool) => {
     })
 }
 
-export const updatePassengerStatus = (passenger_id, status_new, force_login, pickup, action_point_id, timescan, pool) => {
+export const updatePassengerStatus = (passenger_id, status_new, force_login, pickup, action_point_id, timescan, quote_id, pool) => {
     return new Promise((resolve, reject) => {
         var sql = ""
         var params = []
         sql = `
                     UPDATE tb_job_passengers SET status = ? , force_login = ? , date_time_scan = ? , action_point_id = ?
-                        WHERE passenger_id = ?  AND pickup = ?
+                        WHERE passenger_id = ?  AND pickup = ? AND quote_id = ?
                         `
-        params = [status_new, force_login, timescan, action_point_id, passenger_id, pickup]
+        params = [status_new, force_login, timescan, action_point_id, passenger_id, pickup, quote_id]
 
         pool.getConnection((err, conn) => {
             if (err) reject(err)

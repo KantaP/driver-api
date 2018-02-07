@@ -39,8 +39,8 @@ export const getMovement = (qid, driver_id, pool) => {
     return new Promise((resolve, reject) => {
 
         let sql = `SELECT 
-                        Q.quote_id, Q.default_num_id, Q.total_price, Q.price, Q.passenger_name , Q.passenger_number, Q.pay_ok,
-                        M.movement_id, M.datetime_start, M.collection_address, M.destination_address, A.driver_confirm, 
+                        Q.quote_id, Q.default_num_id, Q.total_price, Q.price, Q.passenger_name , Q.passenger_number as passenger_num, Q.pay_ok,
+                        M.movement_id, M.datetime_start, M.collection_address, M.destination_address, A.driver_confirm, A.driver_notes  ,
                         A.driver_pay, A.outbound_hours,
                         (
                             SELECT SUM( amount ) AS total_payment
@@ -65,7 +65,8 @@ export const getMovement = (qid, driver_id, pool) => {
                     AND 
                         M.progress < 10 
                     AND 
-                        Q.status_re='B' 
+                        Q.status_re='B'  
+                    GROUP BY Q.quote_id
                     ORDER BY M.movement_order ASC`
 
 
